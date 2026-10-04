@@ -1,8 +1,7 @@
-#!/usr/bin/env python
 import subprocess, json, time
 from datetime import datetime
 
-PHONE_NUM = "123456789" # !ENTER YOUR PHONE NUMBER!
+PHONE_NUM = "518185058" # !ENTER YOUR PHONE NUMBER!
 num_of_tries = 10
 break_between_tries_val = 3
 timeout_val = break_between_tries_val * num_of_tries
