@@ -1,11 +1,11 @@
-#!/usr/bin/env python
 import subprocess, json, time
 from datetime import datetime
 
 PHONE_NUM = "123456789" # !ENTER YOUR PHONE NUMBER!
-num_of_tries = 10
-break_between_tries_val = 3
-timeout_val = break_between_tries_val * num_of_tries
+
+# Reminder settings
+REMINDER_INTERVAL = 30  # Seconds to wait before checking if we need to resend
+CHECK_INTERVAL = 3      # Seconds between each notification check
 
 def send_sms_question(content):
     print(f"💬 Sending SMS to huawei band 9:\n'{content}'")
@@ -25,6 +25,22 @@ def remove_notification(notification_id):
         print(f"🧹 Removed processed notification ID: {notification_id}")
     except Exception as exception:
         print(f"Error while removing notification: {exception}")
+
+def is_question_notification_present():
+    """Checks if the question SMS notification is still active on the device."""
+    cmd = ["termux-notification-list"]
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        notifications = json.loads(result.stdout)
+        for notification in notifications:
+            if 'content' in notification:
+                text = notification['content'].lower()
+                # Check if our specific question is still visible in notifications
+                if "do you want to start" in text:
+                    return True
+    except Exception as exception:
+        print(f"Error checking existing notifications: {exception}")
+    return False
 
 def check_answer_for_notification(start_time):
     cmd = ["termux-notification-list"]
@@ -58,7 +74,6 @@ def check_answer_for_notification(start_time):
                 notification_id = notification.get('id')
                 
                 # EXACT MATCHING: Check for definitive responses only.
-                # This prevents picking up random words containing 'y' or 'n'.
                 if clean_text == 'y' or clean_text == 'yes':
                     remove_notification(notification_id)
                     return 'y'
@@ -73,32 +88,42 @@ def check_answer_for_notification(start_time):
 # Save exact program start time as a localized datetime object
 script_start_time = datetime.now()
 
-# 1. SENDING MESSAGE
+# 1. SENDING INITIAL MESSAGE
 send_sms_question("Do you want to start the program [y/N]?")
+last_sms_sent_time = time.time()
 
 print("\nWaiting for the answer (send SMS using your watch)...")
 
-# Variable to keep track of the final user response
-final_answer = None
-
-# 2. VALIDATING LOOP
-for i in range(num_of_tries): 
-    time.sleep(break_between_tries_val)
+# 2. INFINITE LOOP WAITING FOR ANSWER
+while True:
+    time.sleep(CHECK_INTERVAL)
+    
     final_answer = check_answer_for_notification(script_start_time)
     
     if final_answer == 'y':
         print("\n✅ Your answer is: [y]")
         # --- ENTER THE CODE TO EXECUTE FOR OPTION 'y' ---
         break
+        
     elif final_answer == 'n':
         print("\n❌ Your answer is: [n]")
         # --- ENTER THE CODE TO EXECUTE FOR OPTION 'n' ---
         break
+        
     else:
-        print(f"  [Try {i+1}/{num_of_tries}] Searching for answer...")
+        print("  Searching for answer... (No response yet)")
+        
+        # If the reminder interval has passed, check if the question is still on the screen
+        if time.time() - last_sms_sent_time > REMINDER_INTERVAL:
+            if is_question_notification_present():
+                print("  [Anti-Spam] Question notification is still present on the phone. Skipping SMS resend.")
+                # Reset the timer so we don't spam logs every loop, but keep waiting
+                last_sms_sent_time = time.time() 
+            else:
+                print("\n⏳ Notification cleared but no answer received. Resending reminder...")
+                send_sms_question("Do you want to start the program [y/N]?")
+                last_sms_sent_time = time.time()  # Reset the timer
 
-# 3. TIMEOUT HANDLING
-if final_answer is None:
-    print(f"\n⏳ Timeout: No reply received within {timeout_val} seconds.")
+print("\nProceeding with the script...")
 
 
