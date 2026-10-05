@@ -89,7 +89,7 @@ def check_answer_for_notification(start_time):
 script_start_time = datetime.now()
 
 # 1. SENDING INITIAL MESSAGE
-send_sms_question("Do you want to start the program [y/N]?")
+send_sms_question("Do you want to start the program [y/n]?")
 last_sms_sent_time = time.time()
 
 print("\nWaiting for the answer (send SMS using your watch)...")
