@@ -6,7 +6,7 @@ PHONE_NUM = "123456789"  # !ENTER YOUR PHONE NUMBER!
 # Reminder settings
 REMINDER_INTERVAL = 3  # Seconds to wait before checking if we need to resend
 CHECK_INTERVAL = 3      # Seconds between each notification check
-
+avilable_options = "torch on, torch off, y, n, exit"
 
 # ==========================================
 # 🛠️ COMMAND DEFINITIONS SECTION (EXTEND HERE)
@@ -124,7 +124,7 @@ def process_incoming_notifications(start_time):
 script_start_time = datetime.now()
 
 # Sending the initial menu list
-MENU_TEXT = "Available commands: start, stop, dnd on, dnd off, exit"
+MENU_TEXT = f"Available commands: {avialable_options}"
 send_sms(MENU_TEXT)
 last_sms_sent_time = time.time()
 
