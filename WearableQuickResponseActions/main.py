@@ -148,4 +148,3 @@ while True:
             last_sms_sent_time = time.time()
 
 print("\n🏁 Program control loop has terminated.")
-l
