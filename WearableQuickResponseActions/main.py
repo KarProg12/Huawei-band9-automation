@@ -12,22 +12,18 @@ CHECK_INTERVAL = 3      # Seconds between each notification check
 # 🛠️ COMMAND DEFINITIONS SECTION (EXTEND HERE)
 # ==========================================
 
-def cmd_start():
-    print("🚀 [ACTION] Launching main program procedure...")
-    # Enter the code you want to execute when 'start' or 'y' is received here
-    # Return True if you want to exit the main loop after this command, otherwise False
-    return False 
-
 def cmd_stop():
     print("🛑 [ACTION] Stopping background processes...")
     return False
 
-def cmd_dnd_on():
-    print("🔕 [ACTION] 'Do Not Disturb' mode turned ON.")
+def torch_on():
+    print("[ACTION] Turning on the torch...")
+    subprocess.run(["termux-torch", "on"])
     return False
 
-def cmd_dnd_off():
-    print("🔔 [ACTION] 'Do Not Disturb' mode turned OFF.")
+def torch_off():
+    print("[ACTION] Turning off the torch...")
+    subprocess.run(["termux-torch", "off"])
     return False
 
 def cmd_exit():
@@ -38,22 +34,12 @@ def cmd_exit():
 # 🗺️ COMMAND MAPPING DICTIONARY (ADD NEW COMMANDS HERE)
 # Key: SMS text (always lowercase) -> Value: function name to execute
 COMMANDS_MAP = {
-    "start": cmd_start,
-    "y": cmd_start,
-    "yes": cmd_start,
+    "torch on": torch_on,
+    "torch off": torch_off,
     
-    "stop": cmd_stop,
     "n": cmd_stop,
-    "no": cmd_stop,
     
-    "do not disturb on": cmd_dnd_on,
-    "dnd on": cmd_dnd_on,
-    
-    "do not disturb off": cmd_dnd_off,
-    "dnd off": cmd_dnd_off,
-    
-    "exit": cmd_exit,
-    "quit": cmd_exit
+    "exit": cmd_exit
 }
 
 # ==========================================
@@ -162,4 +148,4 @@ while True:
             last_sms_sent_time = time.time()
 
 print("\n🏁 Program control loop has terminated.")
-
+l
