@@ -4,9 +4,9 @@ from datetime import datetime
 PHONE_NUM = "123456789"  # !ENTER YOUR PHONE NUMBER!
 
 # Reminder settings
-REMINDER_INTERVAL = 3  # Seconds to wait before checking if we need to resend
-CHECK_INTERVAL = 3      # Seconds between each notification check
-available_options = "torch on, torch off, y, n, exit"
+REMINDER_INTERVAL = 0.1  # Seconds to wait before checking if we need to resend
+CHECK_INTERVAL = 0.1      # Seconds between each notification check
+available_options = "torch on, torch off, mute, unmute, y, n, exit"
 
 # ==========================================
 # 🛠️ COMMAND DEFINITIONS SECTION (EXTEND HERE)
@@ -26,6 +26,16 @@ def torch_off():
     subprocess.run(["termux-torch", "off"])
     return False
 
+def mute():
+    print("[ACTION] Muting...")
+    subprocess.run(["termux-volume", "ring", "0"])
+    return False
+    
+def unmute():
+    print("[ACTION] Unmuting...")
+    subprocess.run(["termux-volume", "ring", "10"])
+    return False
+    
 def cmd_exit():
     print("👋 [ACTION] Shutting down the script completely.")
     return True # Returning True breaks the main loop and exits the program
@@ -36,6 +46,9 @@ def cmd_exit():
 COMMANDS_MAP = {
     "torch on": torch_on,
     "torch off": torch_off,
+
+    "mute": mute,
+    "unmute": unmute,
     
     "n": cmd_stop,
     
@@ -148,3 +161,5 @@ while True:
             last_sms_sent_time = time.time()
 
 print("\n🏁 Program control loop has terminated.")
+
+
